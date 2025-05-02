@@ -13,14 +13,20 @@
 
 package frc.robot.subsystems.drive;
 
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.StatusSignal;
 import com.revrobotics.REVLibError;
 import com.revrobotics.spark.SparkBase;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.DoubleSupplier;
 
 /**
@@ -30,6 +36,14 @@ import java.util.function.DoubleSupplier;
  * all measurements in the sample are valid.
  */
 public class SparkOdometryThread {
+  private final Lock signalsLock = new ReentrantLock();
+  private BaseStatusSignal[] phoenixSignals = new BaseStatusSignal[0];
+  private final List<Queue<Double>> phoenixQueues = new ArrayList<>();
+
+  private final boolean isCANFD = new CANBus("*").isNetworkFD();
+
+  private final double ODOMETRY_FREQUENCY = isCANFD ? 250 : 100;
+
   private final List<SparkBase> sparks = new ArrayList<>();
   private final List<DoubleSupplier> sparkSignals = new ArrayList<>();
   private final List<DoubleSupplier> genericSignals = new ArrayList<>();
@@ -84,6 +98,23 @@ public class SparkOdometryThread {
     return queue;
   }
 
+  public Queue<Double> registerSignal(StatusSignal<Angle> signal) {
+    Queue<Double> queue = new ArrayBlockingQueue<>(20);
+    signalsLock.lock();
+    Drive.odometryLock.lock();
+    try {
+      BaseStatusSignal[] newSignals = new BaseStatusSignal[phoenixSignals.length + 1];
+      System.arraycopy(phoenixSignals, 0, newSignals, 0, phoenixSignals.length);
+      newSignals[phoenixSignals.length] = signal;
+      phoenixSignals = newSignals;
+      phoenixQueues.add(queue);
+    } finally {
+      signalsLock.unlock();
+      Drive.odometryLock.unlock();
+    }
+    return queue;
+  }
+
   /** Returns a new queue that returns timestamp values for each sample. */
   public Queue<Double> makeTimestampQueue() {
     Queue<Double> queue = new ArrayBlockingQueue<>(20);
@@ -99,7 +130,17 @@ public class SparkOdometryThread {
   private void run() {
     // Save new data to queues
     Drive.odometryLock.lock();
+    signalsLock.lock();
     try {
+      if (isCANFD && phoenixSignals.length > 0) {
+        BaseStatusSignal.waitForAll(2.0 / 250, phoenixSignals);
+      } else {
+        // "waitForAll" does not support blocking on multiple signals with a bus
+        // that is not CAN FD, regardless of Pro licensing. No reasoning for this
+        // behavior is provided by the documentation.
+        Thread.sleep((long) (1000.0 / ODOMETRY_FREQUENCY));
+        if (phoenixSignals.length > 0) BaseStatusSignal.refreshAll(phoenixSignals);
+      }
       // Get sample timestamp
       double timestamp = RobotController.getFPGATime() / 1e6;
 
@@ -125,6 +166,8 @@ public class SparkOdometryThread {
           timestampQueues.get(i).offer(timestamp);
         }
       }
+    } catch (InterruptedException e) {
+      e.printStackTrace();
     } finally {
       Drive.odometryLock.unlock();
     }

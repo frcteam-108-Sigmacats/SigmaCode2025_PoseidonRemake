@@ -13,8 +13,12 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnField;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -107,6 +111,41 @@ public class Robot extends LoggedRobot {
   @Override
   public void disabledInit() {
     robotContainer.resetSimulationField();
+    SimulatedArena.getInstance()
+        .addGamePiece(new ReefscapeCoralOnField(new Pose2d(3.6, 4.05, Rotation2d.fromDegrees(90))));
+    SimulatedArena.getInstance()
+        .addGamePiece(
+            new ReefscapeCoralOnField(new Pose2d(4.05, 3.3, Rotation2d.fromDegrees(150))));
+    SimulatedArena.getInstance()
+        .addGamePiece(
+            new ReefscapeCoralOnField(new Pose2d(4.9, 3.25, Rotation2d.fromDegrees(210))));
+    SimulatedArena.getInstance()
+        .addGamePiece(
+            new ReefscapeCoralOnField(new Pose2d(5.38, 4.0, Rotation2d.fromDegrees(270))));
+    SimulatedArena.getInstance()
+        .addGamePiece(
+            new ReefscapeCoralOnField(new Pose2d(4.95, 4.75, Rotation2d.fromDegrees(330))));
+    SimulatedArena.getInstance()
+        .addGamePiece(new ReefscapeCoralOnField(new Pose2d(4.06, 4.8, Rotation2d.fromDegrees(30))));
+    // Red Side
+    SimulatedArena.getInstance()
+        .addGamePiece(
+            new ReefscapeCoralOnField(new Pose2d(12.2, 4.05, Rotation2d.fromDegrees(90))));
+    SimulatedArena.getInstance()
+        .addGamePiece(
+            new ReefscapeCoralOnField(new Pose2d(12.62, 3.25, Rotation2d.fromDegrees(150))));
+    SimulatedArena.getInstance()
+        .addGamePiece(
+            new ReefscapeCoralOnField(new Pose2d(13.5, 3.25, Rotation2d.fromDegrees(210))));
+    SimulatedArena.getInstance()
+        .addGamePiece(
+            new ReefscapeCoralOnField(new Pose2d(13.95, 4.05, Rotation2d.fromDegrees(270))));
+    SimulatedArena.getInstance()
+        .addGamePiece(
+            new ReefscapeCoralOnField(new Pose2d(13.5, 4.8, Rotation2d.fromDegrees(330))));
+    SimulatedArena.getInstance()
+        .addGamePiece(
+            new ReefscapeCoralOnField(new Pose2d(12.62, 4.81, Rotation2d.fromDegrees(30))));
   }
 
   /** This function is called periodically when disabled. */
@@ -162,6 +201,8 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically whilst in simulation. */
   @Override
   public void simulationPeriodic() {
+    Logger.recordOutput(
+        "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
     robotContainer.updateSimulation();
   }
 }
