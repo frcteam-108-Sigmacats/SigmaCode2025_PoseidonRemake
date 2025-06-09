@@ -40,6 +40,17 @@ public final class Constants {
     REPLAY
   }
 
+  public static enum Level {
+    L1,
+    L2,
+    L3,
+    L4,
+    A1,
+    A2,
+    Net,
+    AlgaeSpit
+  }
+
   public static final class PoseConstants {
 
     public static final List<Pose2d> leftPoses =
@@ -74,10 +85,37 @@ public final class Constants {
     public static final List<Pose2d> humanStationPoses =
         (List<Pose2d>)
             List.of(
-                new Pose2d(new Translation2d(1.297, 7.174), Rotation2d.fromDegrees(-53)),
-                new Pose2d(new Translation2d(1.151, 0.963), Rotation2d.fromDegrees(53)),
-                new Pose2d(new Translation2d(16.341, 0.944), Rotation2d.fromDegrees(127)),
-                new Pose2d(new Translation2d(16.049, 7.330), Rotation2d.fromDegrees(-127)));
+                new Pose2d(
+                    new Translation2d(1.35, 7.35),
+                    Rotation2d.fromDegrees(-53)), // Top side Blue Station
+                new Pose2d(
+                    new Translation2d(1.35, 0.3),
+                    Rotation2d.fromDegrees(53)), // Bottome side Blue Station
+                new Pose2d(
+                    new Translation2d(15.8, 0.7),
+                    Rotation2d.fromDegrees(127)), // Bottom Side Red Station
+                new Pose2d(
+                    new Translation2d(16.049, 7.330),
+                    Rotation2d.fromDegrees(-127))); // Top Side Red Station
+
+    public static final List<Pose2d> algaeReefPoses =
+        (List<Pose2d>)
+            List.of(
+                // Blue Side
+                new Pose2d(new Translation2d(3.851, 2.923), Rotation2d.fromDegrees(60)), // ID 17
+                new Pose2d(new Translation2d(3.237, 4.025), Rotation2d.fromDegrees(0)), // ID 18
+                new Pose2d(new Translation2d(3.861, 5.107), Rotation2d.fromDegrees(-60)), // ID 19
+                new Pose2d(new Translation2d(5.1, 5.2), Rotation2d.fromDegrees(-120)), // ID 20
+                new Pose2d(new Translation2d(5.753, 4.015), Rotation2d.fromDegrees(180)), // ID 21
+                new Pose2d(new Translation2d(5.109, 2.943), Rotation2d.fromDegrees(120)), // ID 22
+                // Red Side
+                new Pose2d(new Translation2d(13.670, 2.962), Rotation2d.fromDegrees(120)), // ID 6
+                new Pose2d(new Translation2d(14.313, 4.015), Rotation2d.fromDegrees(180)), // ID 7
+                new Pose2d(new Translation2d(13.689, 5.127), Rotation2d.fromDegrees(-120)), // ID 8
+                new Pose2d(new Translation2d(12.451, 5.107), Rotation2d.fromDegrees(-60)), // ID 9
+                new Pose2d(new Translation2d(11.797, 4.015), Rotation2d.fromDegrees(0)), // ID 10
+                new Pose2d(new Translation2d(12.451, 2.923), Rotation2d.fromDegrees(60)) // ID 11
+                );
 
     public static final Map<Integer, Pose2d> algaeBluePoses =
         (Map<Integer, Pose2d>)

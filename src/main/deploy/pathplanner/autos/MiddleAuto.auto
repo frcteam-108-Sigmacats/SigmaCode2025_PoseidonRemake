@@ -1,0 +1,106 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "StartPoseResetM"
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "LeftAutoAlign"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L4Position"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L4Score"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlgaeRemoveLow"
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "NetPosition"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "MidPath1"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "NetScore"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlgaeRemoveHigh"
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "NetPosition"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "MidPath2"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "NetScore"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

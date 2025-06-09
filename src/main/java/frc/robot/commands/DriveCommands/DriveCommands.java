@@ -11,7 +11,7 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 
-package frc.robot.commands;
+package frc.robot.commands.DriveCommands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -94,7 +94,7 @@ public class DriveCommands {
           drive.runVelocity(
               ChassisSpeeds.fromFieldRelativeSpeeds(
                   speeds,
-                  isFlipped ? drive.getRotation().plus(new Rotation2d(0)) : drive.getRotation()));
+                  isFlipped ? drive.getRotation().plus(new Rotation2d(180)) : drive.getRotation()));
         },
         drive);
   }

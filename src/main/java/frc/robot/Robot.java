@@ -14,6 +14,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -22,6 +23,7 @@ import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFie
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
@@ -36,6 +38,8 @@ import org.littletonrobotics.urcl.URCL;
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
+
+  LoggedMechanism2d mechanism = new LoggedMechanism2d(10, 10);
 
   public Robot() {
     // Record metadata
@@ -92,6 +96,7 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
+    Logger.recordOutput("MyMechanism", mechanism);
     // Optionally switch the thread to high priority to improve loop
     // timing (see the template project documentation for details)
     // Threads.setCurrentThreadPriority(true, 99);
@@ -105,11 +110,15 @@ public class Robot extends LoggedRobot {
 
     // Return to non-RT thread priority (do not modify the first argument)
     // Threads.setCurrentThreadPriority(false, 10);
+
+    Logger.recordOutput("RobotPose", new Pose2d());
+    Logger.recordOutput("ZeroedComponentPoses", new Pose3d[] {new Pose3d()});
   }
 
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
+    SimulatedArena.getInstance().resetFieldForAuto();
     robotContainer.resetSimulationField();
     SimulatedArena.getInstance()
         .addGamePiece(new ReefscapeCoralOnField(new Pose2d(3.6, 4.05, Rotation2d.fromDegrees(90))));
@@ -201,6 +210,8 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically whilst in simulation. */
   @Override
   public void simulationPeriodic() {
+    Logger.recordOutput(
+        "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
     Logger.recordOutput(
         "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
     robotContainer.updateSimulation();

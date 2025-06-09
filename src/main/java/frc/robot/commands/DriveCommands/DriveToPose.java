@@ -2,16 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.DriveCommands;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
+import frc.robot.Constants.PoseConstants;
 import frc.robot.subsystems.drive.Drive;
 import org.littletonrobotics.junction.Logger;
 
@@ -50,11 +53,20 @@ public class DriveToPose extends Command {
         }
         break;
       case ("Net"):
-        targetPose = new Pose2d(7.72, swerve.getPose().getY(), Rotation2d.fromDegrees(0));
+        targetPose =
+            DriverStation.getAlliance().get() == Alliance.Blue
+                ? new Pose2d(7.72, swerve.getPose().getY(), Rotation2d.fromDegrees(0))
+                : new Pose2d(9.890, swerve.getPose().getY(), Rotation2d.fromDegrees(180));
         break;
       case ("Feeder"):
         targetPose = swerve.getPose().nearest(Constants.PoseConstants.humanStationPoses);
+        break;
+      case ("AlgaeRemoval"):
+        targetPose = swerve.getPose().nearest(PoseConstants.algaeReefPoses);
+        break;
     }
+
+    rotation = 0;
     translationController.enableContinuousInput(-15, 15);
     rotationController.enableContinuousInput(-180, 180);
   }
@@ -92,6 +104,14 @@ public class DriveToPose extends Command {
             rotationController.calculate(
                 swerve.getPose().getRotation().getDegrees(), targetPose.getRotation().getDegrees());
         break;
+      case ("AlgaeRemoval"):
+        translation =
+            new Translation2d(
+                translationController.calculate(swerve.getPose().getX(), targetPose.getX()),
+                translationController.calculate(swerve.getPose().getY(), targetPose.getY()));
+        rotation =
+            rotationController.calculate(
+                swerve.getPose().getRotation().getDegrees(), targetPose.getRotation().getDegrees());
     }
 
     ChassisSpeeds speeds =
@@ -99,20 +119,29 @@ public class DriveToPose extends Command {
             translation.getX() * swerve.getMaxLinearSpeedMetersPerSec(),
             translation.getY() * swerve.getMaxLinearSpeedMetersPerSec(),
             rotation * swerve.getMaxAngularSpeedRadPerSec());
+    boolean isFlipped = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
+    swerve.runVelocity(
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            speeds,
+            isFlipped ? swerve.getRotation().plus(new Rotation2d(0)) : swerve.getRotation()));
     Logger.recordOutput("/DriveToPosePID", translation);
+    Logger.recordOutput("/DriveToPosePIDRot", rotation);
     Logger.recordOutput("/TargetPose", targetPose);
-    swerve.runVelocityFieldRelative(speeds);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    swerve.runVelocity(new ChassisSpeeds());
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
     if (mode == "Reef" || mode == "Net") {
-      if (Math.abs(Math.hypot(x, y)) < 0.02) {
+      if (Math.abs(Math.hypot(x, y)) < 0.02
+          && Math.abs(swerve.getRotation().getDegrees() - targetPose.getRotation().getDegrees())
+              <= 0.5) {
         return true;
       } else {
         return false;

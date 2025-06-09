@@ -23,12 +23,17 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import org.littletonrobotics.junction.Logger;
 
 public class Module {
+  // Creates the interface thats going to be used to run the code
   private final ModuleIO io;
+  // Creates an object that stores one instance of the inputs to be logged
   private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
+  // Index of which module we are currently configuring
   private final int index;
 
+  // Creates alerts to notify if motors are disconnected
   private final Alert driveDisconnectedAlert;
   private final Alert turnDisconnectedAlert;
+  // Creates an object to store all modules position
   private SwerveModulePosition[] odometryPositions = new SwerveModulePosition[] {};
 
   public Module(ModuleIO io, int index) {
