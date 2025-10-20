@@ -43,6 +43,7 @@ public class DriveToPose extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    translation = new Translation2d();
     switch (mode) {
       default:
         if (left) {
@@ -56,7 +57,7 @@ public class DriveToPose extends Command {
         targetPose =
             DriverStation.getAlliance().get() == Alliance.Blue
                 ? new Pose2d(7.72, swerve.getPose().getY(), Rotation2d.fromDegrees(0))
-                : new Pose2d(9.890, swerve.getPose().getY(), Rotation2d.fromDegrees(180));
+                : new Pose2d(9.890, swerve.getPose().getY(), Rotation2d.fromDegrees(0));
         break;
       case ("Feeder"):
         targetPose = swerve.getPose().nearest(Constants.PoseConstants.humanStationPoses);
@@ -67,13 +68,14 @@ public class DriveToPose extends Command {
     }
 
     rotation = 0;
-    translationController.enableContinuousInput(-15, 15);
+    translationController.enableContinuousInput(-5, 5);
     rotationController.enableContinuousInput(-180, 180);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    ChassisSpeeds swerveSpeed = new ChassisSpeeds();
     switch (mode) {
       default:
         x = swerve.getPose().getX() - targetPose.getX();
@@ -113,8 +115,7 @@ public class DriveToPose extends Command {
             rotationController.calculate(
                 swerve.getPose().getRotation().getDegrees(), targetPose.getRotation().getDegrees());
     }
-
-    ChassisSpeeds speeds =
+    swerveSpeed =
         new ChassisSpeeds(
             translation.getX() * swerve.getMaxLinearSpeedMetersPerSec(),
             translation.getY() * swerve.getMaxLinearSpeedMetersPerSec(),
@@ -122,10 +123,10 @@ public class DriveToPose extends Command {
     boolean isFlipped = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
     swerve.runVelocity(
         ChassisSpeeds.fromFieldRelativeSpeeds(
-            speeds,
-            isFlipped ? swerve.getRotation().plus(new Rotation2d(0)) : swerve.getRotation()));
+            swerveSpeed,
+            isFlipped ? swerve.getRotation().plus(new Rotation2d(180)) : swerve.getRotation()));
     Logger.recordOutput("/DriveToPosePID", translation);
-    Logger.recordOutput("/DriveToPosePIDRot", rotation);
+    Logger.recordOutput("/DrivePoseChassisSpeeds", swerveSpeed);
     Logger.recordOutput("/TargetPose", targetPose);
   }
 

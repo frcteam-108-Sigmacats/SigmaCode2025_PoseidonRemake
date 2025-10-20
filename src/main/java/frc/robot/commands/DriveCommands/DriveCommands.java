@@ -90,11 +90,15 @@ public class DriveCommands {
                   linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
                   linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
                   omega * drive.getMaxAngularSpeedRadPerSec());
+          // If the swerve drive should be in slow mode then it should half the speed of the
+          // ChassisSpeed
+          if (drive.isSlowSpeedEnabled()) {
+            speeds.times(0.5);
+          }
           boolean isFlipped = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
           drive.runVelocity(
               ChassisSpeeds.fromFieldRelativeSpeeds(
-                  speeds,
-                  isFlipped ? drive.getRotation().plus(new Rotation2d(180)) : drive.getRotation()));
+                  speeds, isFlipped ? drive.getRotation() : drive.getRotation()));
         },
         drive);
   }

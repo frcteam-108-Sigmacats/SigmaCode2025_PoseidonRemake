@@ -20,7 +20,6 @@ public class NetScore extends ParallelRaceGroup {
   public NetScore(
       Drive swerve,
       boolean left,
-      String mode,
       CommandXboxController driver,
       ElevatorMech elevatorMech,
       CXAMech cxaMech,
@@ -29,7 +28,7 @@ public class NetScore extends ParallelRaceGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-        new DriveToPose(swerve, left, mode, driver),
+        new DriveToPose(swerve, left, "Net", driver),
         new ReefScore(elevatorMech, cxaMech, l1, readyToExecute));
   }
 }

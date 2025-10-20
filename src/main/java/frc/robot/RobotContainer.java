@@ -34,7 +34,10 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.Level;
+import frc.robot.Constants.Mode;
 import frc.robot.Constants.PoseConstants;
+import frc.robot.commands.ClimberCommands.DeepClimb;
+import frc.robot.commands.ClimberCommands.PrimeClimb;
 import frc.robot.commands.CommandGroups.AlgaeRemoval;
 import frc.robot.commands.CommandGroups.HumanStationFeeder;
 import frc.robot.commands.CommandGroups.NetScore;
@@ -46,9 +49,13 @@ import frc.robot.commands.ElevatorCommands.ElevatorRestCommand;
 import frc.robot.commands.WristCommands.CXAHumanFeeder;
 import frc.robot.commands.WristCommands.CXAReefScore;
 import frc.robot.commands.WristCommands.CXARestCommand;
+import frc.robot.subsystems.Climber.ClimberIOReal;
+import frc.robot.subsystems.Climber.ClimberMech;
 import frc.robot.subsystems.Elevator.ElevatorIOReal;
 import frc.robot.subsystems.Elevator.ElevatorIOSim;
 import frc.robot.subsystems.Elevator.ElevatorMech;
+import frc.robot.subsystems.Vision.VisionIOReal;
+import frc.robot.subsystems.Vision.VisionMech;
 import frc.robot.subsystems.Wrist.CXAMech;
 import frc.robot.subsystems.Wrist.CXAMechIOReal;
 import frc.robot.subsystems.Wrist.CXAMechIOSim;
@@ -83,6 +90,10 @@ public class RobotContainer {
 
   private ElevatorMech elevatorMech;
 
+  private ClimberMech climber;
+
+  private final VisionMech vision;
+
   // Controller
   public final CommandXboxController controller = new CommandXboxController(0);
 
@@ -100,6 +111,7 @@ public class RobotContainer {
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
+        vision = new VisionMech(new VisionIOReal());
         drive =
             new Drive(
                 new GyroIOPigeon2(),
@@ -107,9 +119,11 @@ public class RobotContainer {
                 new ModuleIOMix(1),
                 new ModuleIOMix(2),
                 new ModuleIOMix(3),
-                (pose) -> {});
+                (pose) -> {},
+                vision);
         cxaMech = new CXAMech(new CXAMechIOReal());
         elevatorMech = new ElevatorMech(new ElevatorIOReal());
+        climber = new ClimberMech(new ClimberIOReal());
         break;
 
       case SIM:
@@ -120,6 +134,7 @@ public class RobotContainer {
         // add the simulated drivetrain to the simulation field
         SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
 
+        vision = new VisionMech(new VisionIOReal());
         // Sim robot, instantiate physics sim IO implementations
         drive =
             new Drive(
@@ -128,15 +143,19 @@ public class RobotContainer {
                 new ModuleIOSim(driveSimulation.getModules()[1]),
                 new ModuleIOSim(driveSimulation.getModules()[2]),
                 new ModuleIOSim(driveSimulation.getModules()[3]),
-                driveSimulation::setSimulationWorldPose);
+                driveSimulation::setSimulationWorldPose,
+                vision);
 
         cxaMech = new CXAMech(new CXAMechIOSim(driveSimulation));
 
         elevatorMech = new ElevatorMech(new ElevatorIOSim());
+
+        climber = new ClimberMech(new ClimberIOReal());
         break;
 
       default:
         // Replayed robot, disable IO implementations
+        vision = new VisionMech(new VisionIOReal());
         drive =
             new Drive(
                 new GyroIO() {},
@@ -144,7 +163,8 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {},
-                (pose) -> {});
+                (pose) -> {},
+                vision);
         break;
     }
 
@@ -178,11 +198,13 @@ public class RobotContainer {
 
     controller
         .leftBumper()
+        .and(() -> Constants.currentMode == Mode.SIM)
         .onTrue(
             Commands.runOnce(() -> drive.setPose(driveSimulation.getSimulatedDriveTrainPose())));
     controller.leftBumper().whileTrue(new DriveToPose(drive, true, "Reef", controller));
     controller
         .rightBumper()
+        .and(() -> Constants.currentMode == Mode.SIM)
         .onTrue(
             Commands.runOnce(() -> drive.setPose(driveSimulation.getSimulatedDriveTrainPose())));
     controller.rightBumper().whileTrue(new DriveToPose(drive, false, "Reef", controller));
@@ -390,7 +412,7 @@ public class RobotContainer {
         .y()
         .and(() -> hasAlgae)
         .whileTrue(
-            new NetScore(drive, false, "Net", controller, elevatorMech, cxaMech, Level.Net, false)
+            new NetScore(drive, false, controller, elevatorMech, cxaMech, Level.Net, false)
                 .andThen(new ReefScore(elevatorMech, cxaMech, Level.Net, false)));
 
     controller
@@ -401,7 +423,7 @@ public class RobotContainer {
         .y()
         .and(() -> hasAlgae)
         .whileFalse(
-            new NetScore(drive, false, "Net", controller, elevatorMech, cxaMech, Level.Net, true)
+            new NetScore(drive, false, controller, elevatorMech, cxaMech, Level.Net, true)
                 .andThen(new ReefScore(elevatorMech, cxaMech, Level.Net, true)));
     controller
         .y()
@@ -487,6 +509,14 @@ public class RobotContainer {
                                 CoralStationsSide.RIGHT_STATION,
                                 DriverStation.getAlliance().get(),
                                 false))));
+    controller
+        .povUp()
+        .and(() -> (Constants.currentMode == Mode.REAL))
+        .toggleOnTrue(new PrimeClimb(climber, drive));
+    controller
+        .povDown()
+        .and(() -> (Constants.currentMode == Mode.REAL))
+        .whileTrue(new DeepClimb(climber));
   }
 
   public void makeAuto() {

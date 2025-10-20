@@ -44,6 +44,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.subsystems.Vision.VisionMech;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -59,17 +60,19 @@ public class Drive extends SubsystemBase {
   private final SysIdRoutine sysId;
   private final Alert gyroDisconnectedAlert =
       new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
+  private boolean slowSpeedEnable = false;
 
-  private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
-  private Rotation2d rawGyroRotation = new Rotation2d();
-  private SwerveModulePosition[] lastModulePositions = // For delta tracking
+  private static SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
+  private static Rotation2d rawGyroRotation = new Rotation2d();
+  private static SwerveModulePosition[] lastModulePositions = // For delta tracking
       new SwerveModulePosition[] {
         new SwerveModulePosition(),
         new SwerveModulePosition(),
         new SwerveModulePosition(),
         new SwerveModulePosition()
       };
-  private SwerveDrivePoseEstimator poseEstimator =
+  private VisionMech vision;
+  private static SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
   private final Consumer<Pose2d> resetSimulationPoseCallBack;
@@ -80,12 +83,14 @@ public class Drive extends SubsystemBase {
       ModuleIO frModuleIO,
       ModuleIO blModuleIO,
       ModuleIO brModuleIO,
-      Consumer<Pose2d> resetSimulationPoseCallBack) {
+      Consumer<Pose2d> resetSimulationPoseCallBack,
+      VisionMech vision) {
     this.gyroIO = gyroIO;
     modules[0] = new Module(flModuleIO, 0);
     modules[1] = new Module(frModuleIO, 1);
     modules[2] = new Module(blModuleIO, 2);
     modules[3] = new Module(brModuleIO, 3);
+    this.vision = vision;
 
     this.resetSimulationPoseCallBack = resetSimulationPoseCallBack;
 
@@ -186,6 +191,18 @@ public class Drive extends SubsystemBase {
 
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
+    if (Constants.currentMode == Mode.REAL) {
+      addVisionMeasurement(vision.getLeftLLBotPose(), vision.getLeftLLBotPoseTimeStamp(), null);
+      addVisionMeasurement(vision.getRightLLBotPose(), vision.getRightLLBotPoseTimeStamp(), null);
+    }
+  }
+
+  public void setSlowSpeedBool(boolean enable) {
+    slowSpeedEnable = enable;
+  }
+
+  public boolean isSlowSpeedEnabled() {
+    return slowSpeedEnable;
   }
 
   /**
@@ -316,6 +333,10 @@ public class Drive extends SubsystemBase {
       output += modules[i].getFFCharacterizationVelocity() / 4.0;
     }
     return output;
+  }
+
+  public static Pose2d visionPose() {
+    return poseEstimator.getEstimatedPosition();
   }
 
   /** Returns the current odometry pose. */
