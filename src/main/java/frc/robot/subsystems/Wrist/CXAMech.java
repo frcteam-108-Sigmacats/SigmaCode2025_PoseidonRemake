@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.Wrist;
 
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
@@ -12,6 +14,12 @@ public class CXAMech extends SubsystemBase {
   private CXAMechIOInputsAutoLogged inputs = new CXAMechIOInputsAutoLogged();
 
   private boolean detectAlgae;
+
+  private Alert cxaMotorDisconnected = new Alert("CXA Motor Disconnected", AlertType.kError);
+  private Alert pivotMotorDisconnected = new Alert("Wrist Pivot Motor Disconnected", AlertType.kError);
+  private Alert hopperMotorDisconnected = new Alert("Hopper Motor Disconnected", AlertType.kError);
+  private Alert absEncDisconnected = new Alert("Wrist Abs Enc Disconnected", AlertType.kError);
+  private Alert canRangeDisconnected = new Alert("Can Range Disconnected", AlertType.kError);
 
   /** Creates a new CXAMech. */
   public CXAMech(CXAMechIO io) {
@@ -23,6 +31,12 @@ public class CXAMech extends SubsystemBase {
     // This method will be called once per scheduler run
     io.updateInputs(inputs);
     Logger.processInputs("CXA_Mech", inputs);
+
+    cxaMotorDisconnected.set(inputs.cxaMotorDiconnected);
+    pivotMotorDisconnected.set(inputs.wristMotorDisconnected);
+    hopperMotorDisconnected.set(inputs.hopperMotorDisconnected);
+    absEncDisconnected.set(inputs.absEncDisconnected);
+    canRangeDisconnected.set(inputs.canRangeDisconnected);
   }
 
   public void intakeAlgae() {

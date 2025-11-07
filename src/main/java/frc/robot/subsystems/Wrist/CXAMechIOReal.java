@@ -2,6 +2,8 @@ package frc.robot.subsystems.Wrist;
 
 import static frc.robot.util.SparkUtil.tryUntilOk;
 
+import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANrangeConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -132,18 +134,17 @@ public class CXAMechIOReal implements CXAMechIO {
     // Applying Configs to CANRange
     canRange.getConfigurator().apply(new CANrangeConfiguration());
     canRange.getConfigurator().apply(canRangeConfigs);
-
-    // Sets up the Alert System
-    cxaMotorDisconnected = new Alert("CXA Motor Disconnected", AlertType.kError);
-    hopperMotorDisconnected = new Alert("Hopper Motor Disconnected", AlertType.kError);
-    wristMotorDisconnected = new Alert("Wrist Motor Disconnected", AlertType.kError);
-    wristEncoderDisconnected = new Alert("Wrist Abs Encoder Disconnected", AlertType.kError);
-    canRangeDisconnected = new Alert("CAN Range Disconnected", AlertType.kError);
   }
 
   // Updates the inputs that will be sent to AdvantageScope
   @Override
   public void updateInputs(CXAMechIOInputs inputs) {
+
+    inputs.cxaMotorDiconnected = cxaMotor.isConnected();
+    inputs.wristMotorDisconnected = wristMotor.getFaults().can;
+    inputs.hopperMotorDisconnected = hopperMotor.getFaults().can;
+    inputs.absEncDisconnected = wristMotor.getFaults().sensor;
+    inputs.canRangeDisconnected = canRange.isConnected();
     // Assinging the inputs to be logged to CXA Motor readings
     inputs.cxaMotorCurrentAmps = cxaMotor.getStatorCurrent().getValueAsDouble();
     inputs.cxaMotorVoltage = cxaMotor.getMotorVoltage().getValueAsDouble();

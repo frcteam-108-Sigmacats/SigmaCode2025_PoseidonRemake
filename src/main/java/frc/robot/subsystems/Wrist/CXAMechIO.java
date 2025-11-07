@@ -5,6 +5,11 @@ import org.littletonrobotics.junction.AutoLog;
 public interface CXAMechIO {
   @AutoLog
   public static class CXAMechIOInputs {
+    public boolean cxaMotorDiconnected = false;
+    public boolean wristMotorDisconnected = false;
+    public boolean hopperMotorDisconnected = false;
+    public boolean absEncDisconnected = false;
+    public boolean canRangeDisconnected = false;
     public double cxaMotorVoltage = 0.0;
     public double cxaMotorCurrentAmps = 0.0;
     public double cxaWristVoltage = 0.0;

@@ -98,6 +98,8 @@ public class ClimberIOReal implements ClimberIO {
   // Updates all the inputs we want to log to show up in AdvantageScope
   @Override
   public void updateInputs(ClimberIOInputs inputs) {
+    inputs.climberPivotMotorDisconnected = climberPivotMotor.getFaults().can;
+    inputs.climberIntakeMotorDisconnected = climberIntakeMotor.getFaults().can;
     // Applying the voltages to the specific motors outputs
     inputs.climberPivotMotorVoltage = climberPivotMotor.getAppliedOutput();
     inputs.climberIntakeMotorVoltage = climberIntakeMotor.getAppliedOutput();

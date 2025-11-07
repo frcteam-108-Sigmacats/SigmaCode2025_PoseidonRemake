@@ -5,6 +5,8 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ClimberIO {
   @AutoLog
   public static class ClimberIOInputs {
+    public boolean climberPivotMotorDisconnected;
+    public boolean climberIntakeMotorDisconnected;
     public double climberAngle = 0.0;
     public double climberPivotMotorVoltage = 0.0;
     public double climberIntakeMotorVoltage = 0.0;

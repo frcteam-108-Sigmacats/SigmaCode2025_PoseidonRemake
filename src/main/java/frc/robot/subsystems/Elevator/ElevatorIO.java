@@ -5,6 +5,8 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ElevatorIO {
   @AutoLog
   public static class ElevatorIOInputs {
+    public boolean leftElevatorMotorDisconnected = false;
+    public boolean rightElevatorMotorDiconnected = false;
     public double leftElevatorMotorVoltage = 0.0;
     public double leftElevatorMotorCurrentAmps = 0.0;
     public double rightElevatorMotorVoltage = 0.0;

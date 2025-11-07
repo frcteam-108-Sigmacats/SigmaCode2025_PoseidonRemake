@@ -107,6 +107,9 @@ public class ElevatorIOReal implements ElevatorIO {
   // Assigns inputs to be logged to component readings
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
+
+    inputs.leftElevatorMotorDisconnected = leftMotor.getFaults().can;
+    inputs.rightElevatorMotorDiconnected = rightMotor.getFaults().can;
     // Sets Current Amps and Voltage to the motors readings
     inputs.leftElevatorMotorCurrentAmps = leftMotor.getOutputCurrent();
     inputs.leftElevatorMotorVoltage = leftMotor.getBusVoltage();

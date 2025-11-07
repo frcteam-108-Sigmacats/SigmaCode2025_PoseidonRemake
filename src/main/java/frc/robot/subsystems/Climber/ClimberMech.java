@@ -4,12 +4,20 @@
 
 package frc.robot.subsystems.Climber;
 
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
+
 import org.littletonrobotics.junction.Logger;
 
 public class ClimberMech extends SubsystemBase {
   private ClimberIO io;
   private ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
+
+  private Alert climberPivotMotorAlert = new Alert("Climber Pivot Motor Disconnected", AlertType.kError);
+  private Alert climberIntakeMotorAlert = new Alert("Climber Intake Motor Disconnected", AlertType.kError);
   /** Creates a new ClimberMech. */
   public ClimberMech(ClimberIO io) {
     this.io = io;
@@ -19,6 +27,8 @@ public class ClimberMech extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Climber_Mech", inputs);
+    climberIntakeMotorAlert.set(inputs.climberIntakeMotorDisconnected && Constants.currentMode == Mode.REAL);
+    climberPivotMotorAlert.set(inputs.climberPivotMotorDisconnected && Constants.currentMode == Mode.REAL);
     // This method will be called once per scheduler run
   }
 
