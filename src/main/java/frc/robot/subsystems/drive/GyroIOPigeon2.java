@@ -28,7 +28,7 @@ import java.util.Queue;
 
 /** IO implementation for Pigeon 2. */
 public class GyroIOPigeon2 implements GyroIO {
-  private final Pigeon2 pigeon = new Pigeon2(pigeonCanId);
+  private final Pigeon2 pigeon = new Pigeon2(pigeonCanId, "*");
   private final StatusSignal<Angle> yaw = pigeon.getYaw();
   private final Queue<Double> yawPositionQueue;
   private final Queue<Double> yawTimestampQueue;
@@ -40,8 +40,8 @@ public class GyroIOPigeon2 implements GyroIO {
     yaw.setUpdateFrequency(odometryFrequency);
     yawVelocity.setUpdateFrequency(50.0);
     pigeon.optimizeBusUtilization();
-    yawTimestampQueue = SparkOdometryThread.getInstance().makeTimestampQueue();
-    yawPositionQueue = SparkOdometryThread.getInstance().registerSignal(yaw::getValueAsDouble);
+    yawTimestampQueue = SparkXPhoenixOdometryThread.getInstance().makeTimestampQueue();
+    yawPositionQueue = SparkXPhoenixOdometryThread.getInstance().registerSignal(pigeon.getYaw());
   }
 
   @Override

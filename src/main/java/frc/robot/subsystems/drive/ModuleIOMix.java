@@ -80,7 +80,8 @@ public class ModuleIOMix implements ModuleIO {
               case 2 -> backLeftDriveCanId;
               case 3 -> backRightDriveCanId;
               default -> 0;
-            });
+            },
+            "*");
     turnMotor =
         new SparkMax(
             switch (module) {
@@ -102,7 +103,6 @@ public class ModuleIOMix implements ModuleIO {
     driveConfig.Slot0.kP = driveKp;
     driveConfig.Slot0.kI = 0;
     driveConfig.Slot0.kD = driveKd;
-    driveMotor.getConfigurator().apply(new TalonFXConfiguration());
     driveMotor.getConfigurator().apply(driveConfig);
     driveMotor.setPosition(0);
 
@@ -142,10 +142,9 @@ public class ModuleIOMix implements ModuleIO {
                 turnConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
 
     // Create odometry queues
-    timestampQueue = SparkOdometryThread.getInstance().makeTimestampQueue();
-    drivePositionQueue = SparkOdometryThread.getInstance().registerSignal(driveMotor.getPosition());
-    turnPositionQueue =
-        SparkOdometryThread.getInstance().registerSignal(turnMotor, turnEncoder::getPosition);
+    timestampQueue = SparkXPhoenixOdometryThread.getInstance().makeTimestampQueue();
+    drivePositionQueue = SparkXPhoenixOdometryThread.getInstance().registerSignal(driveMotor.getPosition());
+    turnPositionQueue = SparkXPhoenixOdometryThread.getInstance().registerSignal(turnMotor, turnEncoder::getPosition);
   }
 
   @Override

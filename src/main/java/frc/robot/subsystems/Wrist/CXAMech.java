@@ -16,7 +16,8 @@ public class CXAMech extends SubsystemBase {
   private boolean detectAlgae;
 
   private Alert cxaMotorDisconnected = new Alert("CXA Motor Disconnected", AlertType.kError);
-  private Alert pivotMotorDisconnected = new Alert("Wrist Pivot Motor Disconnected", AlertType.kError);
+  private Alert pivotMotorDisconnected =
+      new Alert("Wrist Pivot Motor Disconnected", AlertType.kError);
   private Alert hopperMotorDisconnected = new Alert("Hopper Motor Disconnected", AlertType.kError);
   private Alert absEncDisconnected = new Alert("Wrist Abs Enc Disconnected", AlertType.kError);
   private Alert canRangeDisconnected = new Alert("Can Range Disconnected", AlertType.kError);

@@ -12,8 +12,6 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.Alert.AlertType;
 
 public class ElevatorIOReal implements ElevatorIO {
   // Instantiates the Elevator Motor Objects
@@ -30,11 +28,6 @@ public class ElevatorIOReal implements ElevatorIO {
   // Instantiates PID Controller for Elevator Position Control
   private SparkClosedLoopController elevatorPID;
 
-  // Creating alerts to notify if components disconnect
-  private Alert leftMotorDisconnected;
-  private Alert rightMotorDisconnected;
-  private Alert elevatorEncoderDisconnected;
-
   public ElevatorIOReal() {
     // Assigns the Motor to correct IDs
     leftMotor = new SparkMax(ElevatorConstants.leftElevatorMotorID, MotorType.kBrushless);
@@ -46,10 +39,12 @@ public class ElevatorIOReal implements ElevatorIO {
     rightMotorConfig.idleMode(IdleMode.kBrake);
     rightMotorConfig.smartCurrentLimit(ElevatorConstants.ElevatorMotorCurrentlimit);
 
+    // Testing out internal encoder position
+    rightMotorConfig.encoder.positionConversionFactor(1);
     // Setting the CPR of our Alternate Encoder for accurate readings
-    rightMotorConfig.alternateEncoder.countsPerRevolution(8192);
-    rightMotorConfig.alternateEncoder.inverted(
-        true); // Inverting our encoder to read the position of the elevator the right way
+    // rightMotorConfig.alternateEncoder.countsPerRevolution(8192);
+    // rightMotorConfig.alternateEncoder.inverted(
+    //     true); // Inverting our encoder to read the position of the elevator the right way
 
     // Assinging the PID Values to the Right Elevator PID Controller
     rightMotorConfig.closedLoop.pid(
@@ -57,7 +52,8 @@ public class ElevatorIOReal implements ElevatorIO {
     rightMotorConfig.closedLoop.velocityFF(1 / 5676); // Setting the Feedforward Voltage
     rightMotorConfig.closedLoop.feedbackSensor(
         FeedbackSensor
-            .kAlternateOrExternalEncoder); // Telling our PID Controller to use the Through Bore
+            .kPrimaryEncoder); // Telling our PID Controller to use the Through Bore/ Internal
+    // Encoder
     // Encoder connected to the motor as feedback
 
     // Setting the Elevator Forward and Reverse Limits to make sure our Robot does not go beyond its
@@ -81,7 +77,8 @@ public class ElevatorIOReal implements ElevatorIO {
 
     // Setting the Relative Encoder variable to the Right Elevator Motor External connection to the
     // Through Bore Encoder
-    elevatorEnc = rightMotor.getAlternateEncoder();
+    // elevatorEnc = rightMotor.getAlternateEncoder();
+    elevatorEnc = rightMotor.getEncoder(); // Using the internal encoder
 
     // Add Configurations to Motors
     tryUntilOk(
@@ -98,10 +95,6 @@ public class ElevatorIOReal implements ElevatorIO {
                 rightMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
 
     elevatorEnc.setPosition(0);
-
-    leftMotorDisconnected = new Alert("Left Elevator Motor Disconnected", AlertType.kError);
-    rightMotorDisconnected = new Alert("Right Elevator Motor Disconnected", AlertType.kError);
-    elevatorEncoderDisconnected = new Alert("Elevator Encoder Disconnected", AlertType.kError);
   }
 
   // Assigns inputs to be logged to component readings
@@ -118,10 +111,6 @@ public class ElevatorIOReal implements ElevatorIO {
 
     // Assigned Elevator Position to the encoder readings
     inputs.elevatorPos = elevatorEnc.getPosition();
-
-    leftMotorDisconnected.set(leftMotor.getFaults().can);
-    rightMotorDisconnected.set(rightMotor.getFaults().can);
-    elevatorEncoderDisconnected.set(rightMotor.getFaults().sensor);
   }
 
   @Override

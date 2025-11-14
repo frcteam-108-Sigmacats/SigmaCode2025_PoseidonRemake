@@ -118,43 +118,47 @@ public class Robot extends LoggedRobot {
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
-    SimulatedArena.getInstance().resetFieldForAuto();
-    robotContainer.resetSimulationField();
-    SimulatedArena.getInstance()
-        .addGamePiece(new ReefscapeCoralOnField(new Pose2d(3.6, 4.05, Rotation2d.fromDegrees(90))));
-    SimulatedArena.getInstance()
-        .addGamePiece(
-            new ReefscapeCoralOnField(new Pose2d(4.05, 3.3, Rotation2d.fromDegrees(150))));
-    SimulatedArena.getInstance()
-        .addGamePiece(
-            new ReefscapeCoralOnField(new Pose2d(4.9, 3.25, Rotation2d.fromDegrees(210))));
-    SimulatedArena.getInstance()
-        .addGamePiece(
-            new ReefscapeCoralOnField(new Pose2d(5.38, 4.0, Rotation2d.fromDegrees(270))));
-    SimulatedArena.getInstance()
-        .addGamePiece(
-            new ReefscapeCoralOnField(new Pose2d(4.95, 4.75, Rotation2d.fromDegrees(330))));
-    SimulatedArena.getInstance()
-        .addGamePiece(new ReefscapeCoralOnField(new Pose2d(4.06, 4.8, Rotation2d.fromDegrees(30))));
-    // Red Side
-    SimulatedArena.getInstance()
-        .addGamePiece(
-            new ReefscapeCoralOnField(new Pose2d(12.2, 4.05, Rotation2d.fromDegrees(90))));
-    SimulatedArena.getInstance()
-        .addGamePiece(
-            new ReefscapeCoralOnField(new Pose2d(12.62, 3.25, Rotation2d.fromDegrees(150))));
-    SimulatedArena.getInstance()
-        .addGamePiece(
-            new ReefscapeCoralOnField(new Pose2d(13.5, 3.25, Rotation2d.fromDegrees(210))));
-    SimulatedArena.getInstance()
-        .addGamePiece(
-            new ReefscapeCoralOnField(new Pose2d(13.95, 4.05, Rotation2d.fromDegrees(270))));
-    SimulatedArena.getInstance()
-        .addGamePiece(
-            new ReefscapeCoralOnField(new Pose2d(13.5, 4.8, Rotation2d.fromDegrees(330))));
-    SimulatedArena.getInstance()
-        .addGamePiece(
-            new ReefscapeCoralOnField(new Pose2d(12.62, 4.81, Rotation2d.fromDegrees(30))));
+    if (Constants.currentMode == frc.robot.Constants.Mode.SIM) {
+      SimulatedArena.getInstance().resetFieldForAuto();
+      robotContainer.resetSimulationField();
+      SimulatedArena.getInstance()
+          .addGamePiece(
+              new ReefscapeCoralOnField(new Pose2d(3.6, 4.05, Rotation2d.fromDegrees(90))));
+      SimulatedArena.getInstance()
+          .addGamePiece(
+              new ReefscapeCoralOnField(new Pose2d(4.05, 3.3, Rotation2d.fromDegrees(150))));
+      SimulatedArena.getInstance()
+          .addGamePiece(
+              new ReefscapeCoralOnField(new Pose2d(4.9, 3.25, Rotation2d.fromDegrees(210))));
+      SimulatedArena.getInstance()
+          .addGamePiece(
+              new ReefscapeCoralOnField(new Pose2d(5.38, 4.0, Rotation2d.fromDegrees(270))));
+      SimulatedArena.getInstance()
+          .addGamePiece(
+              new ReefscapeCoralOnField(new Pose2d(4.95, 4.75, Rotation2d.fromDegrees(330))));
+      SimulatedArena.getInstance()
+          .addGamePiece(
+              new ReefscapeCoralOnField(new Pose2d(4.06, 4.8, Rotation2d.fromDegrees(30))));
+      // Red Side
+      SimulatedArena.getInstance()
+          .addGamePiece(
+              new ReefscapeCoralOnField(new Pose2d(12.2, 4.05, Rotation2d.fromDegrees(90))));
+      SimulatedArena.getInstance()
+          .addGamePiece(
+              new ReefscapeCoralOnField(new Pose2d(12.62, 3.25, Rotation2d.fromDegrees(150))));
+      SimulatedArena.getInstance()
+          .addGamePiece(
+              new ReefscapeCoralOnField(new Pose2d(13.5, 3.25, Rotation2d.fromDegrees(210))));
+      SimulatedArena.getInstance()
+          .addGamePiece(
+              new ReefscapeCoralOnField(new Pose2d(13.95, 4.05, Rotation2d.fromDegrees(270))));
+      SimulatedArena.getInstance()
+          .addGamePiece(
+              new ReefscapeCoralOnField(new Pose2d(13.5, 4.8, Rotation2d.fromDegrees(330))));
+      SimulatedArena.getInstance()
+          .addGamePiece(
+              new ReefscapeCoralOnField(new Pose2d(12.62, 4.81, Rotation2d.fromDegrees(30))));
+    }
   }
 
   /** This function is called periodically when disabled. */

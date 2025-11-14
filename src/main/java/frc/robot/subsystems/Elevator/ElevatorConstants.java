@@ -5,6 +5,12 @@ public class ElevatorConstants {
   public static final int leftElevatorMotorID = 11;
   public static final int rightElevatorMotorID = 12;
 
+  // Elevator Position Conversion
+  public static final double gearRatio = 12.0;
+  public static final double gearDiameter = 0.25;
+  // Conversion: Rotor Rotations to Elevator Linear Translation in Feet
+  public static final double elevatorPositionConversion = (Math.PI * gearDiameter) / gearRatio;
+
   // Elevator Current Limit
   public static final int ElevatorMotorCurrentlimit = 40;
 

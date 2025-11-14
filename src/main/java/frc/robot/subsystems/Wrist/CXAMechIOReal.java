@@ -2,8 +2,6 @@ package frc.robot.subsystems.Wrist;
 
 import static frc.robot.util.SparkUtil.tryUntilOk;
 
-import com.ctre.phoenix6.StatusCode;
-import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANrangeConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -24,8 +22,6 @@ import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.Alert.AlertType;
 
 public class CXAMechIOReal implements CXAMechIO {
   // Instantiates the motors in the mechanism
@@ -50,13 +46,6 @@ public class CXAMechIOReal implements CXAMechIO {
 
   // Create config object to apply to CANRange
   private CANrangeConfiguration canRangeConfigs = new CANrangeConfiguration();
-
-  // Creates Alerts to notify if any component is disconnected
-  private Alert cxaMotorDisconnected;
-  private Alert hopperMotorDisconnected;
-  private Alert wristMotorDisconnected;
-  private Alert wristEncoderDisconnected;
-  private Alert canRangeDisconnected;
 
   public CXAMechIOReal() {
     // Assigning the IDs to all hardware components in the mechanism
@@ -160,13 +149,6 @@ public class CXAMechIOReal implements CXAMechIO {
     // Assinging the inputs to be logged to the absolute encoder readings and CAM Range Detection
     inputs.wristAngle = wristPivotEnc.getPosition();
     inputs.detectCoral = canRange.getIsDetected(true).getValue();
-
-    // Updates on whether alert should pop up or not
-    cxaMotorDisconnected.set(!cxaMotor.isConnected());
-    hopperMotorDisconnected.set(hopperMotor.getFaults().can);
-    wristMotorDisconnected.set(wristMotor.getFaults().can);
-    canRangeDisconnected.set(canRange.isConnected());
-    wristEncoderDisconnected.set(wristMotor.getFaults().sensor);
   }
 
   // Sets the Wrist to a position using PID

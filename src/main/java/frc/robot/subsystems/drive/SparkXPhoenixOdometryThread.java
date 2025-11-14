@@ -35,7 +35,7 @@ import java.util.function.DoubleSupplier;
  * <p>This version includes an overload for Spark signals, which checks for errors to ensure that
  * all measurements in the sample are valid.
  */
-public class SparkOdometryThread {
+public class SparkXPhoenixOdometryThread {
   private final Lock signalsLock = new ReentrantLock();
   private BaseStatusSignal[] phoenixSignals = new BaseStatusSignal[0];
   private final List<Queue<Double>> phoenixQueues = new ArrayList<>();
@@ -51,17 +51,17 @@ public class SparkOdometryThread {
   private final List<Queue<Double>> genericQueues = new ArrayList<>();
   private final List<Queue<Double>> timestampQueues = new ArrayList<>();
 
-  private static SparkOdometryThread instance = null;
+  private static SparkXPhoenixOdometryThread instance = null;
   private Notifier notifier = new Notifier(this::run);
 
-  public static SparkOdometryThread getInstance() {
+  public static SparkXPhoenixOdometryThread getInstance() {
     if (instance == null) {
-      instance = new SparkOdometryThread();
+      instance = new SparkXPhoenixOdometryThread();
     }
     return instance;
   }
 
-  private SparkOdometryThread() {
+  private SparkXPhoenixOdometryThread() {
     notifier.setName("OdometryThread");
   }
 
@@ -99,7 +99,7 @@ public class SparkOdometryThread {
   }
 
   public Queue<Double> registerSignal(StatusSignal<Angle> signal) {
-    Queue<Double> queue = new ArrayBlockingQueue<>(20);
+    ArrayBlockingQueue<Double> queue = new ArrayBlockingQueue<>(10);
     signalsLock.lock();
     Drive.odometryLock.lock();
     try {

@@ -9,15 +9,16 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
-
 import org.littletonrobotics.junction.Logger;
 
 public class ElevatorMech extends SubsystemBase {
 
   private ElevatorIO io;
   private ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
-  private Alert leftMotorDisconnected = new Alert("Left Elevator Motor Disconnected", AlertType.kError);
-  private Alert rightMotorDisconnected = new Alert("Right Elevator Motor Disconnected", AlertType.kError);
+  private Alert leftMotorDisconnected =
+      new Alert("Left Elevator Motor Disconnected", AlertType.kError);
+  private Alert rightMotorDisconnected =
+      new Alert("Right Elevator Motor Disconnected", AlertType.kError);
   /** Creates a new ElevatorMech. */
   public ElevatorMech(ElevatorIO io) {
     this.io = io;
@@ -27,9 +28,11 @@ public class ElevatorMech extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Elevator_Mech", inputs);
-    
-    leftMotorDisconnected.set(inputs.leftElevatorMotorDisconnected && Constants.currentMode == Mode.REAL);
-    rightMotorDisconnected.set(inputs.rightElevatorMotorDiconnected && Constants.currentMode == Mode.REAL);
+
+    leftMotorDisconnected.set(
+        inputs.leftElevatorMotorDisconnected && Constants.currentMode == Mode.REAL);
+    rightMotorDisconnected.set(
+        inputs.rightElevatorMotorDiconnected && Constants.currentMode == Mode.REAL);
     // This method will be called once per scheduler run
   }
 

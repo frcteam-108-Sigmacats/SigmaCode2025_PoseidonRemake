@@ -5,11 +5,11 @@ public class ClimberConstants {
   public static int climberPivotID = 9;
   public static int climberIntakeID = 10;
   public static int servoMotorID = 0;
-  public static int cageReaderID = 0;
+  public static int cageReaderID = 9;
 
   // The current limit to the rev motors
   public static int climberPivotCurrentLimit = 40;
-  public static int climberIntakeCurrentLimit = 40;
+  public static int climberIntakeCurrentLimit = 35;
 
   // The PID values for the Position Controller to position the climber
   public static double kP = 0;
